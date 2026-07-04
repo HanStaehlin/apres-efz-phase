@@ -1,0 +1,20 @@
+__pycache__/
+*.pyc
+*.egg-info/
+.venv/
+.venv-test/
+
+# Regenerated figure output (location.png is a checked-in input asset, not output)
+figs/*
+!figs/location.png
+
+# Large data not vendored in this repo (see README)
+data/ImageP2_python.zarr
+data/ImageP2_python_low.zarr
+data/ImageP2_python_high.zarr
+data/F0_amplitude_cache.npz
+data/F_efz_volume_phase_sims.npz
+data/raw/
+data/airborne/
+
+.DS_Store
