@@ -78,9 +78,8 @@ percentile pairs.
 
 History
 -------
-The technique was prototyped under the working name "q-space"
-(after diffusion-MRI propagator imaging) in
-`experiments/vh_qspace_real.py`.  It is now packaged here as a
+The technique was prototyped under the working name "q-space" (after
+diffusion-MRI propagator imaging).  It is now packaged here as a
 production module with the canonical name *Multi-band Decorrelation
 Inversion*.
 """
@@ -166,10 +165,10 @@ def second_diff_matrix(n: int) -> np.ndarray:
 # discriminator is therefore the coherence LEVEL at short lags, not the
 # solver mass or the curve shape.  `gate_is_noise` implements that test.
 #
-# (Empirically validated in experiments/mdi_noise_fix_test.py: a
-#  short-lag level gate at ~3/√N_t rejects 60/60 pure-noise realisations
-#  with zero false v_min spikes, while keeping genuine static reflectors,
-#  moving populations, and real shallow-layer / EFZ windows.)
+# (Empirically validated: a short-lag level gate at ~3/√N_t rejects
+#  60/60 pure-noise realisations with zero false v_min spikes, while
+#  keeping genuine static reflectors, moving populations, and real
+#  shallow-layer / EFZ windows.)
 
 def short_lag_level(gamma_obs: np.ndarray, n_bands: int = 3,
                     n_short: int = 5) -> float:
@@ -378,71 +377,6 @@ def pv_stats(v_grid: np.ndarray, P: np.ndarray) -> dict:
         p84=_pct(0.84),  p95=_pct(0.95),
         p975=_pct(0.975), p995=_pct(0.995),
     )
-
-
-# ── Common-mode phase-error removal (PGA-style) ──────────────────────
-# NOTE: kept-but-UNUSED.  These two functions were prototyped and benchmarked
-# (cm_removal_benchmark.py, mdi_common_mode_test.py) but are intentionally NOT
-# wired into any pipeline — the common-mode pre-step was judged too complex to
-# adopt for now.  They are retained as a tested reference: re-enabling is a
-# one-line pre-step `S_w *= exp(-1j * estimate_common_mode_phase(S_deep))` per
-# band before the coherence.  See mdi_calibration_and_math.md §5b for the
-# rationale and the PGA-vs-SVD benchmark.  Do not delete without updating that
-# note and the two diagnostic scripts that import this.
-def estimate_common_mode_phase(S: np.ndarray, n_iter: int = 6,
-                               keep_frac: float = 0.5) -> np.ndarray:
-    """Estimate the depth-independent time-varying phase φ_err(t).
-
-    [UNUSED in the pipeline — see the module note above; kept as a benchmarked
-    reference.]
-
-    A propagation phase screen (shallow-firn delay changes) plus instrument
-    drift adds the SAME time-varying phase to every depth bin.  This is the
-    SAR Phase-Gradient-Autofocus idea with the synthetic aperture replaced by
-    TIME: iteratively estimate the brightness-weighted common inter-burst
-    phase increment across depth, integrate, remove, repeat.
-
-    Benchmarked (cm_removal_benchmark.py) to recover an injected non-linear
-    common-mode to ~0.01 rad — vs ~0.5 rad for an SVD rank-1 drop — and to
-    de-bias the MDI magnitude inversion.
-
-    NB removes ALL depth-common temporal phase, including the genuine bulk
-    v_z ramp.  That linear part is invisible to magnitude coherence anyway
-    (|γ| is unchanged by a common linear phase); only the NON-LINEAR part
-    affects MDI / the phase-coherence.  Valid for strain/relative and MDI use.
-
-    Parameters
-    ----------
-    S : (n_z, n_t) complex depth×time slab.
-    n_iter : PGA iterations (1 ⇒ single robust pass).
-    keep_frac : fraction of the brightest bins used each iteration.
-
-    Returns
-    -------
-    phi_err : (n_t,) float — the estimated common-mode phase (rad).
-    """
-    S = np.asarray(S)
-    nt = S.shape[1]
-    phi = np.zeros(nt)
-    Scur = S.copy()
-    for _ in range(max(1, n_iter)):
-        bright = np.mean(np.abs(Scur), axis=1)
-        thr = np.quantile(bright, 1.0 - keep_frac) if keep_frac < 1.0 else -np.inf
-        Ssel = Scur[bright >= thr]
-        if Ssel.shape[0] < 1:
-            Ssel = Scur
-        dphi = np.angle(np.sum(Ssel[:, 1:] * np.conj(Ssel[:, :-1]), axis=0))
-        step = np.concatenate([[0.0], np.cumsum(dphi)])
-        phi = phi + step
-        Scur = S * np.exp(-1j * phi[None, :])
-    return phi
-
-
-def remove_common_mode(S: np.ndarray, n_iter: int = 6,
-                       keep_frac: float = 0.5):
-    """Return (S_clean, phi_err): S with the common-mode phase removed."""
-    phi = estimate_common_mode_phase(S, n_iter=n_iter, keep_frac=keep_frac)
-    return S * np.exp(-1j * phi[None, :]), phi
 
 
 # ── Coherent / decorrelating split ───────────────────────────────────
