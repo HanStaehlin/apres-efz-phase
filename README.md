@@ -31,6 +31,7 @@ src/apres/
     io.py                       # raw ApRES .DAT loading
     superresolution.py          # matrix-pencil range super-resolution
 figures/                        # one script per paper figure (see table below)
+scripts/                        # raw .DAT -> .mat / .zarr conversion (see Data)
 data/                           # small (<6 MB) cached intermediate results, included directly
 figs/                           # figure scripts write their PDF/PNG output here
 ```
@@ -73,10 +74,16 @@ and already has a permanent home:
 - **Airborne echogram**: Center for Remote Sensing of Ice Sheets (CReSIS), 2017_Antarctica_Basler
   season, frame `20171204_06_010`. Place the file at `data/airborne/Data_20171204_06_010.mat`.
 - **Processed products** (`data/ImageP2_python.zarr`, `data/F0_amplitude_cache.npz`, raw `.DAT`
-  files under `data/raw/`) are generated from the raw record via `apres.io` and are not included
-  here due to size (up to ~700 MB); place them under `data/` using the paths referenced in each
-  script. `make_paper_figures.py` will regenerate `F0_amplitude_cache.npz` automatically from
-  `data/raw/*.DAT` on first run if it's missing.
+  files under `data/raw/`) are not included here due to size (up to ~700 MB), but are fully
+  reproducible from the raw record with the scripts in `scripts/`:
+  - `python scripts/process_apres_raw.py --data-folder data/raw --output data/ImageP2_python.mat --zarr`
+    processes the raw `.DAT` files into `ImageP2_python.mat` and (with `--zarr`) directly into
+    `ImageP2_python.zarr` in one pass, using `apres.io.process_timeseries`.
+  - `python scripts/convert_mat_to_zarr.py --input data/ImageP2_python.mat` converts an existing
+    `.mat` (e.g. obtained directly from the Zenodo archive above) to `.zarr` without reprocessing
+    the raw files.
+  - `make_paper_figures.py` will also regenerate `F0_amplitude_cache.npz` automatically from
+    `data/raw/*.DAT` on first run if it's missing.
 - Small (<6 MB total) cached results that let most figures reproduce without the full pipeline are
   included directly under `data/`.
 
