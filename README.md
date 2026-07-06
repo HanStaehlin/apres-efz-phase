@@ -1,5 +1,7 @@
 # apres-efz-phase
 
+![Inside the Echo-Free Zone, amplitude is dead but phase stays coherent — the core finding this repo implements](assets/banner.jpg)
+
 Code implementing **CW-MLPR** (Coherence-Weighted Multi-Lag Phase Regression) and **MDI**
 (Multi-band Decorrelation Inversion), two amplitude-independent phase-coherence estimators that
 recover vertical velocity and horizontal-decorrelation distributions in the ApRES Echo-Free Zone,
