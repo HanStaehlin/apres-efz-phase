@@ -1,8 +1,8 @@
 # apres-efz-phase
 
 Code implementing **CW-MLPR** (Coherence-Weighted Multi-Lag Phase Regression) and **MDI**
-(Multi-band Decorrelation Inversion) — two amplitude-independent phase-coherence estimators that
-recover vertical velocity and horizontal-decorrelation distributions in the ApRES Echo-Free Zone —
+(Multi-band Decorrelation Inversion), two amplitude-independent phase-coherence estimators that
+recover vertical velocity and horizontal-decorrelation distributions in the ApRES Echo-Free Zone,
 plus the scripts that generate every figure in:
 
 > **Evidence for Coherent Phase Signal in the Antarctic Echo-Free Zone**
@@ -65,7 +65,7 @@ record.
 
 ## Data
 
-This repository intentionally does not vendor the underlying ApRES record — it's hundreds of MB
+This repository intentionally does not includ the underlying ApRES record, it's hundreds of MB
 and already has a permanent home:
 
 - **Raw ApRES data and original processing pipeline**: Siegfried, Venturelli, *et al.*, 2023,
